@@ -99,6 +99,12 @@ exports.authenticate = function(hook_name, context, cb) {
         var userpass = new Buffer(context.req.headers.authorization.split(' ')[1], 'base64').toString().split(":");
         var username = userpass.shift();
         var password = userpass.join(':');
+        
+        if (settings.ep_hash_auth) {
+            if (settings.ep_hash_auth.username_caseInsensitive) username = username.toLowerCase();
+            if (settings.ep_hash_auth.username_trimWhitespaces) username = username.trim();
+            if (settings.ep_hash_auth.password_trimWhitespaces) password = password.trim(); // TODO: This will only trim whitespaces at the end of pw, because at the beginning the hash type is given
+        }
 
         // Authenticate user via settings.json
         if (settings.users[username] !== undefined && settings.users[username].hash !== undefined) {
